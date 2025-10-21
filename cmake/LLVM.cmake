@@ -5,12 +5,24 @@ if (CMAKE_HOST_APPLE)
     endforeach ()
 endif ()
 
-find_package(LLVM 14 REQUIRED CONFIG)
+set(LLVM_CONFIG_EXECUTABLE "llvm-config")
+execute_process(
+    COMMAND ${LLVM_CONFIG_EXECUTABLE} --cxxflags --ldflags --libs all
+    OUTPUT_VARIABLE LLVM_CXXFLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+string(REPLACE " " ";" LLVM_CXXFLAGS_LIST ${LLVM_CXXFLAGS})
+# string(REPLACE "std=c++17" "" LLVM_CXXFLAGS_LIST ${LLVM_CXXFLAGS})
+add_compile_options(PRIVATE ${LLVM_CXXFLAGS_LIST})
+add_link_options(PRIVATE ${LLVM_CXXFLAGS_LIST})
+link_libraries(LLVM-20)
 
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+# find_package(LLVM 14 REQUIRED CONFIG)
 
-include_directories(${LLVM_INCLUDE_DIRS})
+# message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 
-add_definitions(${LLVM_DEFINITIONS})
+# include_directories(${LLVM_INCLUDE_DIRS})
 
-llvm_map_components_to_libnames(LLVM_LIBS core codegen irreader linker support target ${LLVM_TARGETS_TO_BUILD})
+# add_definitions(${LLVM_DEFINITIONS})
+
+# llvm_map_components_to_libnames(LLVM_LIBS core codegen irreader linker support target ${LLVM_TARGETS_TO_BUILD})
